@@ -1,0 +1,27 @@
+#!/bin/sh
+
+if [ $# -eq 0 ]; then
+	exit 1
+fi
+
+extraoptions=""
+if [ ! -z $2 ]; then
+	extraoptions=$2
+fi
+
+startdir=`pwd`
+archive=`basename $1`
+archivedir=`dirname $1`
+archivename=`echo $archive | sed "s/\..*$//g"`
+tmpdir="$archivename.tmp"
+
+cd $archivedir
+zcat $archive > $archivename
+mkdir $tmpdir
+cd $tmpdir
+cpio -i < ../$archivename
+cpio -t < ../$archivename | tar -cf "../$archivename.tar" $extraoptions -T -
+cd ..
+rm -rf $tmpdir
+rm $archivename
+cd $startdir
